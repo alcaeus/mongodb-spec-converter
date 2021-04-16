@@ -2,6 +2,7 @@
 
 namespace App\Converter\Crud\V2;
 
+use App\Converter\ListConverter;
 use App\Converter\Operation\LegacyOperationConverter;
 use App\Converter\TestItemConverterInterface;
 use Symfony\Component\Yaml\Reference\Anchor;
@@ -19,7 +20,8 @@ final class CrudV2TestsConverter implements TestItemConverterInterface
 
     public function convert(string $fieldName, mixed $data): mixed
     {
-        $operations = $this->convertOperations($data['operations']);
+        $operations = (new ListConverter(new LegacyOperationConverter(), false))
+            ->convert('', $data['operations']);
 
         if (isset($operation['failPoint'])) {
             array_unshift($operations, [
@@ -84,16 +86,6 @@ final class CrudV2TestsConverter implements TestItemConverterInterface
         ]];
 
         return isset($anchorName) ? new Anchor($anchorName, $result) : $result;
-    }
-
-    private function convertOperations(mixed $operations): array
-    {
-        $converter = new LegacyOperationConverter();
-
-        return array_map(
-            fn($operation): array => $converter->convert('', $operation),
-            $operations,
-        );
     }
 
     private function convertCommandExpectations(array $command): array
