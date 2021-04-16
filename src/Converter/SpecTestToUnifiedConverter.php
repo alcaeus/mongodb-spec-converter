@@ -45,10 +45,6 @@ class SpecTestToUnifiedConverter
         $basename = $file->getBasename();
         $output = ($this->converter)::getOutputDir() . $basename;
 
-        if (in_array($basename, ($this->converter)::getManuallyModifiedFiles()) && file_exists($output)) {
-            return;
-        }
-
         $inputData = Yaml::parseFile($input, Yaml::PARSE_REFERENCES_AS_OBJECTS);
 
         $initialOutputData = [];
