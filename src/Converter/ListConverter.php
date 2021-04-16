@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Converter\Crud;
-
-use App\Converter\TestItemConverterInterface;
+namespace App\Converter;
 
 final class ListConverter implements TestItemConverterInterface
 {
