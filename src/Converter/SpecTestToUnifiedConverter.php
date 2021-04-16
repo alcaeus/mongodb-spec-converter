@@ -45,7 +45,7 @@ class SpecTestToUnifiedConverter
         $basename = $file->getBasename();
         $output = ($this->converter)::getOutputDir() . $basename;
 
-        $inputData = Yaml::parseFile($input, Yaml::PARSE_REFERENCES_AS_OBJECTS);
+        $inputData = Yaml::parseFile($input, Yaml::PARSE_REFERENCES_AS_OBJECTS | Yaml::PARSE_EMPTY_MAP_AS_OBJECT);
 
         $initialOutputData = [];
         $rootConverter = ($this->converter)::getRootConverter();
@@ -55,7 +55,7 @@ class SpecTestToUnifiedConverter
 
         $outputData = $this->applyItemConverters($inputData, $initialOutputData);
 
-        $yaml = Yaml::dump($outputData, 12, 2);
+        $yaml = Yaml::dump($outputData, 12, 2, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_OBJECT_AS_MAP);
         $yaml = <<<YAML
 # This file was created automatically using mongodb-spec-converter.
 # Please review the generated file, then remove this notice.
