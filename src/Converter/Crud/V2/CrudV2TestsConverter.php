@@ -52,7 +52,7 @@ final class CrudV2TestsConverter implements TestItemConverterInterface
             'client' => new Reference('client0'),
             'events' => array_map(
                 fn ($expectation) => ['commandStartedEvent' => array_filter([
-                    'command' => $expectation['command_started_event']['command'],
+                    'command' => $this->convertCommandExpectations($expectation['command_started_event']['command']),
                     'commandName' => $expectation['command_started_event']['command_name'] ?? false,
                     'databaseName' => $expectation['command_started_event']['database_name'] ?? false,
                 ])],
@@ -88,6 +88,23 @@ final class CrudV2TestsConverter implements TestItemConverterInterface
         return array_map(
             fn($operation): array => $converter->convert('', $operation),
             $operations,
+        );
+    }
+
+    private function convertCommandExpectations(array $command): array
+    {
+        return $this->convertExpectedNullValues($command);
+    }
+
+    private function convertExpectedNullValues(array $array): array
+    {
+        return array_map(
+            fn ($value) => match (true) {
+                is_array($value) => $this->convertExpectedNullValues($value),
+                is_null($value) => ['$$exists' => false],
+                default => $value,
+            },
+            $array,
         );
     }
 }
