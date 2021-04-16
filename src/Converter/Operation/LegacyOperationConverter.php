@@ -4,6 +4,7 @@ namespace App\Converter\Operation;
 
 use App\Converter\TestItemConverterInterface;
 use Symfony\Component\Yaml\Reference\Reference;
+use function App\array_filter_null;
 use function array_map;
 
 final class LegacyOperationConverter implements TestItemConverterInterface
@@ -52,7 +53,7 @@ final class LegacyOperationConverter implements TestItemConverterInterface
             $unifiedOperation['expectResult'] = $data['result'];
         }
 
-        return $unifiedOperation;
+        return array_filter_null($unifiedOperation);
     }
 
     private function getOperationObjectName(string $object): string

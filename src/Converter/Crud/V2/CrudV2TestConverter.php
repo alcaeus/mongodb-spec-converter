@@ -7,6 +7,8 @@ use App\Converter\Operation\LegacyOperationConverter;
 use App\Converter\TestItemConverterInterface;
 use Symfony\Component\Yaml\Reference\Anchor;
 use Symfony\Component\Yaml\Reference\Reference;
+use function App\array_filter_null;
+use function App\array_map_recursive;
 use function array_filter;
 use function array_map;
 use function array_unshift;
@@ -20,11 +22,8 @@ final class CrudV2TestConverter implements TestItemConverterInterface
 
     public function convert(string $fieldName, mixed $data): mixed
     {
-        $operations = (new ListConverter(new LegacyOperationConverter(), false))
-            ->convert('', $data['operations']);
-
         if (isset($data['failPoint'])) {
-            array_unshift($operations, [
+            array_unshift($data['operations'], [
                 'name' => 'failPoint',
                 'object' => 'testRunner',
                 'arguments' => [
@@ -34,19 +33,19 @@ final class CrudV2TestConverter implements TestItemConverterInterface
             ]);
         }
 
-        return array_filter(
-            [
-                'description' => $data['description'],
-                'skipReason' => $data['skipReason'] ?? null,
-                // failPoint handled above
-                // clientOptions not supported, will cause errors to point out manual work
-                'clientOptions' => $data['clientOptions'] ?? null,
-                'operations' => $operations,
-                'expectEvents' => $this->convertExpectedEvents($data['expectations'] ?? null),
-                'outcome' => $this->convertOutcome($data['outcome'] ?? null),
-            ],
-            fn ($data): bool => $data !== null,
-        );
+        $operations = (new ListConverter(new LegacyOperationConverter(), false))
+            ->convert('', $data['operations']);
+
+        return array_filter_null([
+            'description' => $data['description'],
+            'skipReason' => $data['skipReason'] ?? null,
+            // failPoint handled above
+            // clientOptions not supported, will cause errors to point out manual work
+            'clientOptions' => $data['clientOptions'] ?? null,
+            'operations' => $operations,
+            'expectEvents' => $this->convertExpectedEvents($data['expectations'] ?? null),
+            'outcome' => $this->convertOutcome($data['outcome'] ?? null),
+        ]);
     }
 
     private function convertExpectedEvents(?array $expectations): ?array
@@ -111,12 +110,8 @@ final class CrudV2TestConverter implements TestItemConverterInterface
 
     private function convertExpectedNullValues(array $array): array
     {
-        return array_map(
-            fn ($value) => match (true) {
-                is_array($value) => $this->convertExpectedNullValues($value),
-                is_null($value) => ['$$exists' => false],
-                default => $value,
-            },
+        return array_map_recursive(
+            fn ($value) => $value !== null ? $value : ['$$exists' => false],
             $array,
         );
     }
