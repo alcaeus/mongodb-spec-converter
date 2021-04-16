@@ -37,7 +37,7 @@ final class CrudV2SuiteConverter implements TestSuiteConverterInterface
             // collection_name handled in root converter
             // database_name handled in root converter
             'data' => new InitialDataConverter(),
-            'tests' => new ListConverter(new CrudV2TestsConverter(), true),
+            'tests' => new ListConverter(new CrudV2TestConverter(), true),
         ];
     }
 }

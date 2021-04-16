@@ -11,7 +11,7 @@ use function array_filter;
 use function array_map;
 use function array_unshift;
 
-final class CrudV2TestsConverter implements TestItemConverterInterface
+final class CrudV2TestConverter implements TestItemConverterInterface
 {
     private const DEFAULT_UPDATE_CMD_OPTIONS = [
         'multi' => ['$$unsetOrMatches' => false],
@@ -23,13 +23,13 @@ final class CrudV2TestsConverter implements TestItemConverterInterface
         $operations = (new ListConverter(new LegacyOperationConverter(), false))
             ->convert('', $data['operations']);
 
-        if (isset($operation['failPoint'])) {
+        if (isset($data['failPoint'])) {
             array_unshift($operations, [
                 'name' => 'failPoint',
                 'object' => 'testRunner',
                 'arguments' => [
                     'client' => new Reference('client0'),
-                    'failPoint' => $operation['failPoint'],
+                    'failPoint' => $data['failPoint'],
                 ],
             ]);
         }
