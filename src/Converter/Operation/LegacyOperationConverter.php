@@ -2,12 +2,12 @@
 
 namespace App\Converter\Operation;
 
-use App\Converter\TestItemConverterInterface;
+use App\Converter\YamlAnchorAwareConverter;
 use Symfony\Component\Yaml\Reference\Reference;
 use function App\array_filter_null;
 use function array_map;
 
-final class LegacyOperationConverter implements TestItemConverterInterface
+final class LegacyOperationConverter extends YamlAnchorAwareConverter
 {
     private const DEFAULT_OBJECT_NAME_MAPPINGS = [
         'collection' => 'collection0',
@@ -16,7 +16,7 @@ final class LegacyOperationConverter implements TestItemConverterInterface
 
     public function __construct(private array $objectNameMappings = self::DEFAULT_OBJECT_NAME_MAPPINGS) {}
 
-    public function convert(string $fieldName, mixed $data): ?array
+    protected function doConvert(string $fieldName, mixed $data): ?array
     {
         if ($data === null) {
             return null;
@@ -31,24 +31,41 @@ final class LegacyOperationConverter implements TestItemConverterInterface
             );
         }
 
-        if (is_array($data['arguments']) && isset($data['arguments']['options'])) {
-            $options = $data['arguments']['options'];
-            unset($data['arguments']['options']);
-            $data['arguments'] = array_merge($data['arguments'], $options);
+        if ($data['name'] === 'runCommand' && isset($data['command_name'])) {
+            $data['arguments']['commandName'] = $data['command_name'];
+            unset($data['command_name']);
+        }
+
+        if (isset($data['arguments']) && is_array($data['arguments'])) {
+            if (isset($data['arguments']['options'])) {
+                $options = $data['arguments']['options'];
+                unset($data['arguments']['options']);
+                $data['arguments'] = array_merge($data['arguments'], $options);
+            }
+
+            if (isset($data['arguments']['session']) && !$data['arguments']['session'] instanceof Reference) {
+                $data['arguments']['session'] = new Reference($data['arguments']['session']);
+            }
         }
 
         $unifiedOperation = [
-            'object' => new Reference($this->getOperationObjectName($data['object'] ?? 'collection')),
+            'object' => $this->getOperationObject($data['object'] ?? 'collection'),
+            // databaseOptions not supported, will cause validation errors to point out manual work
+            'databaseOptions' => $data['databaseOptions'] ?? null,
             // collectionOptions not supported, will cause validation errors to point out manual work
             'collectionOptions' => $data['collectionOptions'] ?? null,
             'name' => $data['name'],
-            'arguments' => $data['arguments'],
+            'arguments' => $data['arguments'] ?? null,
+            'command_name' => $data['command_name'] ?? null,
             // error handled below
             // result handled below
         ];
 
-        if (isset($data['error'])) {
+        if (isset($data['error']) && $data['error'] === true) {
             $unifiedOperation['expectError'] = ['isError' => $data['error']];
+            if (isset($data['result']) && is_array($data['result'])) {
+                $unifiedOperation['expectError'] += $data['result'];
+            }
         } elseif (isset($data['result'])) {
             $unifiedOperation['expectResult'] = $data['result'];
         }
@@ -56,8 +73,12 @@ final class LegacyOperationConverter implements TestItemConverterInterface
         return array_filter_null($unifiedOperation);
     }
 
-    private function getOperationObjectName(string $object): string
+    private function getOperationObject(string $object): string | Reference
     {
-        return $this->objectNameMappings[$object] ?? $object;
+        if ($object === 'testRunner') {
+            return $object;
+        }
+
+        return new Reference($this->objectNameMappings[$object] ?? $object);
     }
 }
