@@ -54,6 +54,10 @@ class SpecTestToUnifiedConverter
         }
 
         $outputData = $this->applyItemConverters($inputData, $initialOutputData);
+        $outputData = array_filter(
+            $outputData,
+            fn ($input): bool  => $input !== [],
+        );
 
         $yaml = Yaml::dump($outputData, 12, 2, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_OBJECT_AS_MAP);
         $yaml = <<<YAML

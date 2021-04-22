@@ -13,11 +13,10 @@ final class CrudV2RootConverter implements RootConverterInterface
         return [
             'description' => basename($filename, '.yml'),
             'schemaVersion' => '1.1',
+            'runOnRequirements' => [],
             'createEntities' => [
                 ['client' => [
                     'id' => new Anchor('client0', 'client0'),
-                    'useMultipleMongoses' => false,
-                    'uriOptions' => ['retryReads' => false],
                     'observeEvents' => ['commandStartedEvent'],
                 ]],
                 ['database' => [
@@ -30,7 +29,9 @@ final class CrudV2RootConverter implements RootConverterInterface
                     'database' => 'database0',
                     'collectionName' => $inputData['collection_name'] ?? new Anchor('collection_name', 'crud-v2'),
                 ]],
-            ]
+            ],
+            'initialData' => [],
+            'tests' => [],
         ];
     }
 }
