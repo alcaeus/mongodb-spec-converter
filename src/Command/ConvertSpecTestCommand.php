@@ -6,6 +6,7 @@ use App\Converter\Crud\V2\CrudV2SuiteConverter;
 use App\Converter\SpecTestToUnifiedConverter;
 use App\Converter\TestSuiteConverterInterface;
 use LogicException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException as InvalidConsoleArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -14,13 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function is_subclass_of;
 use function sprintf;
 
+#[AsCommand('app:convert-spec-tests')]
 class ConvertSpecTestCommand extends Command
 {
     private const SUITES = [
         'crud-v2' => CrudV2SuiteConverter::class,
     ];
-
-    protected static $defaultName = 'app:convert-spec-tests';
 
     protected function configure()
     {
@@ -32,7 +32,7 @@ class ConvertSpecTestCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $suite = $input->getArgument('suite');
 

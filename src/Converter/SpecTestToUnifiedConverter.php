@@ -45,7 +45,7 @@ class SpecTestToUnifiedConverter
         $basename = $file->getBasename();
         $output = ($this->converter)::getOutputDir() . $basename;
 
-        $inputData = Yaml::parseFile($input, Yaml::PARSE_REFERENCES_AS_OBJECTS | Yaml::PARSE_EMPTY_MAP_AS_OBJECT);
+        $inputData = Yaml::parseFile($input, Yaml::PARSE_REFERENCES_AS_OBJECTS | Yaml::PARSE_OBJECT_FOR_MAP);
 
         $initialOutputData = [];
         $rootConverter = ($this->converter)::getRootConverter();
