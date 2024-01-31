@@ -4,6 +4,7 @@ namespace App\Converter;
 
 use InvalidArgumentException;
 use RuntimeException;
+use stdClass;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -25,14 +26,14 @@ class SpecTestToUnifiedConverter
         }
     }
 
-    public function convert(): void
+    public function convert(?string $mask = null): void
     {
         $baseDir = ($this->converter)::getInputDir();
         $finder = new Finder();
         $finder
             ->files()
             ->in($baseDir)
-            ->name(($this->converter)::getMask());
+            ->name($mask ?? ($this->converter)::getMask());
 
         foreach ($finder as $file) {
             $this->convertFile($file);
@@ -70,7 +71,7 @@ YAML;
         (new Filesystem())->dumpFile($output, $yaml);
     }
 
-    private function applyItemConverters(array $inputData, array $initialOutputData = []): array
+    private function applyItemConverters(stdClass $inputData, array $initialOutputData = []): array
     {
         $outputData = $initialOutputData;
 
@@ -86,7 +87,7 @@ YAML;
                 ));
             }
 
-            $convertedData = $converter->convert($fieldName, $inputData[$fieldName] ?? null);
+            $convertedData = $converter->convert($fieldName, $inputData->$fieldName ?? null);
             if ($convertedData === null) {
                 continue;
             }

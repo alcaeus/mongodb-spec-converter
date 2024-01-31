@@ -20,9 +20,9 @@ class OutcomeConverter implements TestItemConverterInterface
         }
 
         $result = [[
-            'collectionName' => $data['collection']['name'] ?? new Reference('collection_name'),
+            'collectionName' => $data->collection->name ?? new Reference('collection_name'),
             'databaseName' => new Reference('database_name'),
-            'documents' => $data['collection']['data'],
+            'documents' => $data->collection->data,
         ]];
 
         return isset($anchorName) ? new Anchor($anchorName, $result) : $result;

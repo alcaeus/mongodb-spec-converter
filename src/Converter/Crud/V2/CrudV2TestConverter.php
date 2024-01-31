@@ -16,10 +16,10 @@ final class CrudV2TestConverter implements TestItemConverterInterface
     public function convert(string $fieldName, mixed $data): mixed
     {
         if (isset($data['failPoint'])) {
-            array_unshift($data['operations'], [
+            array_unshift($data['operations'], (object) [
                 'name' => 'failPoint',
                 'object' => 'testRunner',
-                'arguments' => [
+                'arguments' => (object) [
                     'client' => new Reference('client0'),
                     'failPoint' => $data['failPoint'],
                 ],

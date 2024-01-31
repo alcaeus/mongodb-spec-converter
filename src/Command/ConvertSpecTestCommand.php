@@ -30,7 +30,7 @@ class ConvertSpecTestCommand extends Command
 
         $this
             ->addArgument('suite', InputArgument::REQUIRED, 'Test suite to convert')
-            ->addArgument('mask', InputArgument::OPTIONAL, 'Optional file mask for tests', '**.yml')
+            ->addArgument('mask', InputArgument::OPTIONAL, 'Optional file mask for tests')
         ;
     }
 
@@ -44,7 +44,7 @@ class ConvertSpecTestCommand extends Command
 
         $converter = self::SUITES[$suite];
 
-        (new SpecTestToUnifiedConverter($converter))->convert();
+        (new SpecTestToUnifiedConverter($converter))->convert($input->getArgument('mask'));
 
         return Command::SUCCESS;
     }

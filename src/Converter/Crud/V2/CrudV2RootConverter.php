@@ -8,7 +8,7 @@ use function basename;
 
 final class CrudV2RootConverter implements RootConverterInterface
 {
-    public function convert(string $filename, array $inputData): array
+    public function convert(string $filename, object $inputData): array
     {
         return [
             'description' => basename($filename, '.yml'),
@@ -22,12 +22,12 @@ final class CrudV2RootConverter implements RootConverterInterface
                 ['database' => [
                     'id' => new Anchor('database0', 'database0'),
                     'client' => 'client0',
-                    'databaseName' => $inputData['database_name'] ?? new Anchor('database_name', 'crud-v2'),
+                    'databaseName' => $inputData->database_name ?? new Anchor('database_name', 'crud-v2'),
                 ]],
                 ['collection' => [
                     'id' => new Anchor('collection0', 'collection0'),
                     'database' => 'database0',
-                    'collectionName' => $inputData['collection_name'] ?? new Anchor('collection_name', 'crud-v2'),
+                    'collectionName' => $inputData->collection_name ?? new Anchor('collection_name', 'crud-v2'),
                 ]],
             ],
             'initialData' => [],

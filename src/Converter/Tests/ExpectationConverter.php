@@ -3,6 +3,7 @@
 namespace App\Converter\Tests;
 
 use App\Converter\YamlAnchorAwareConverter;
+use stdClass;
 use Symfony\Component\Yaml\Reference\Reference;
 use function App\array_map_recursive;
 use function array_filter;
@@ -25,23 +26,27 @@ final class ExpectationConverter extends YamlAnchorAwareConverter
 
     protected function doConvert(string $fieldName, mixed $data): ?array
     {
-        if (!is_array($data)) {
+        if (!is_object($data)) {
             return $data;
         }
+
+        $data = (array) $data;
 
         reset($data);
         $event = key($data);
         $eventData = current($data);
 
         return [self::EVENT_NAME_MAP[$event] ?? $event => array_filter([
-            'command' => $this->convertCommandExpectations($eventData['command']),
-            'commandName' => $eventData['command_name'] ?? false,
-            'databaseName' => $eventData['database_name'] ?? false,
+            'command' => $this->convertCommandExpectations($eventData->command),
+            'commandName' => $eventData->command_name ?? false,
+            'databaseName' => $eventData->database_name ?? false,
         ])];
     }
 
-    private function convertCommandExpectations(array $command): array
+    private function convertCommandExpectations(stdClass $command): array
     {
+        $command = (array) $command;
+
         $command = $this->addMissingUpdateCommandOptions($command);
         $command = $this->replaceSessionIdCheck($command);
         $command = $this->replaceMagicNumberExpectations($command);
@@ -56,7 +61,7 @@ final class ExpectationConverter extends YamlAnchorAwareConverter
         }
 
         $command['updates'] = array_map(
-            fn (array $update): array => $update + self::DEFAULT_UPDATE_CMD_OPTIONS,
+            fn (stdClass $update): array => (array) $update + self::DEFAULT_UPDATE_CMD_OPTIONS,
             $command['updates'],
         );
 
@@ -78,8 +83,8 @@ final class ExpectationConverter extends YamlAnchorAwareConverter
             $command['getMore'] = ['$$type' => 'long'];
         }
 
-        if (isset($command['readConcern']['afterClusterTime']) && $command['readConcern']['afterClusterTime'] === 42) {
-            $command['readConcern']['afterClusterTime'] = ['$$exists' => true];
+        if (isset($command['readConcern']->afterClusterTime) && $command['readConcern']->afterClusterTime === 42) {
+            $command['readConcern']->afterClusterTime = ['$$exists' => true];
         }
 
         if (isset($command['recoveryToken']) && $command['recoveryToken'] === 42) {

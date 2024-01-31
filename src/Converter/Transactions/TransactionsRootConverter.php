@@ -9,11 +9,11 @@ use function basename;
 
 final class TransactionsRootConverter implements RootConverterInterface
 {
-    public function convert(string $filename, array $inputData): array
+    public function convert(string $filename, object $inputData): array
     {
         return [
             'description' => basename($filename, '.yml'),
-            'schemaVersion' => '1.1',
+            'schemaVersion' => '1.3',
             'createEntities' => [
                 ['client' => [
                     'id' => new Anchor('client0', 'client0'),
@@ -23,12 +23,12 @@ final class TransactionsRootConverter implements RootConverterInterface
                 ['database' => [
                     'id' => new Anchor('database0', 'database0'),
                     'client' => new Reference('client0'),
-                    'databaseName' => $inputData['database_name'] ?? new Anchor('database_name', 'transactions'),
+                    'databaseName' => $inputData->database_name ?? new Anchor('database_name', 'transactions'),
                 ]],
                 ['collection' => [
                     'id' => new Anchor('collection0', 'collection0'),
                     'database' => new Reference('database0'),
-                    'collectionName' => $inputData['collection_name'] ?? new Anchor('collection_name', 'transactions'),
+                    'collectionName' => $inputData->collection_name ?? new Anchor('collection_name', 'transactions'),
                 ]],
                 ['session' => [
                     'id' => new Anchor('session0', 'session0'),
