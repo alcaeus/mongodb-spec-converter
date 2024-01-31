@@ -13,6 +13,7 @@ final class TransactionsRootConverter implements RootConverterInterface
     {
         return [
             'description' => basename($filename, '.yml'),
+            // 1.3 is required because of load-balanced topologies
             'schemaVersion' => '1.3',
             'createEntities' => [
                 ['client' => [
