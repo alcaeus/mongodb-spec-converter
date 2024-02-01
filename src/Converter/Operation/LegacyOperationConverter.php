@@ -6,6 +6,8 @@ use App\Converter\YamlAnchorAwareConverter;
 use Symfony\Component\Yaml\Reference\Reference;
 use function App\array_filter_null;
 use function array_map;
+use function count;
+use function is_object;
 
 final class LegacyOperationConverter extends YamlAnchorAwareConverter
 {
@@ -66,7 +68,24 @@ final class LegacyOperationConverter extends YamlAnchorAwareConverter
             if (isset($data->result) && is_array($data->result)) {
                 $unifiedOperation['expectError'] += $data->result;
             }
-        } elseif (isset($data->result)) {
+        }
+
+        if (isset($data->result)) {
+            // insertedId is optional
+            if (isset($data->result->insertedId)) {
+                $data->result->insertedId = ['$$unsetOrMatches' => $data->result->insertedId];
+            }
+
+            // insertedIds is optional
+            if (isset($data->result->insertedIds)) {
+                $data->result->insertedIds = ['$$unsetOrMatches' => $data->result->insertedIds];
+            }
+
+            // Results consisting entirely of optional fields are optional
+            if (is_object($data->result) && count((array) $data->result) === 1 && (isset($data->result->insertedId) || isset($data->result->insertedIds))) {
+                $data->result = ['$$unsetOrMatches' => $data->result];
+            }
+
             $unifiedOperation['expectResult'] = $data->result;
         }
 
