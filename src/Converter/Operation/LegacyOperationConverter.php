@@ -64,10 +64,14 @@ final class LegacyOperationConverter extends YamlAnchorAwareConverter
         ];
 
         if (isset($data->error) && $data->error === true) {
-            $unifiedOperation['expectError'] = ['isError' => $data->error];
-            if (isset($data->result) && is_array($data->result)) {
-                $unifiedOperation['expectError'] += $data->result;
-            }
+            $unifiedOperation['expectError'] = ['isError' => true];
+        }
+
+        // Extract error fields from result
+        if (isset($data->result->errorContains) || isset($data->result->errorCodeName) || isset($data->result->errorLabelsContain) ||isset($data->result->errorLabelsOmit)) {
+            $unifiedOperation['expectError'] ??= [];
+            $unifiedOperation['expectError'] += (array) $data->result;
+            unset($data->result);
         }
 
         if (isset($data->result)) {
