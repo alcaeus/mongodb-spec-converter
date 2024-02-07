@@ -80,7 +80,7 @@ final class ExpectationConverter extends YamlAnchorAwareConverter
     private function replaceMagicNumberExpectations(array $command): array
     {
         if (isset($command['getMore'])) {
-            $command['getMore'] = ['$$type' => 'long'];
+            $command['getMore'] = ['$$type' => ['int', 'long']];
         }
 
         if (isset($command['readConcern']->afterClusterTime) && $command['readConcern']->afterClusterTime === 42) {
