@@ -13,9 +13,9 @@ final class RunOnRequirementConverter implements TestItemConverterInterface
         return [
             'runOnRequirements' => array_map(
                 static function ($runOnRequirement) {
-                    if (isset($runOnRequirement['topology'])) {
-                        $runOnRequirement['topologies'] = $runOnRequirement['topology'];
-                        unset($runOnRequirement['topology']);
+                    if (isset($runOnRequirement->topology)) {
+                        $runOnRequirement->topologies = $runOnRequirement->topology;
+                        unset($runOnRequirement->topology);
                     }
 
                     return $runOnRequirement;

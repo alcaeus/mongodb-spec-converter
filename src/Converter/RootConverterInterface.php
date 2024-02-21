@@ -4,5 +4,5 @@ namespace App\Converter;
 
 interface RootConverterInterface
 {
-    public function convert(string $filename, array $inputData): array;
+    public function convert(string $filename, object $inputData): array;
 }

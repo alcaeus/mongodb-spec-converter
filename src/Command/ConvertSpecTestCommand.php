@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Converter\Crud\V2\CrudV2SuiteConverter;
 use App\Converter\SpecTestToUnifiedConverter;
 use App\Converter\TestSuiteConverterInterface;
+use App\Converter\Transactions\TransactionsSuiteConverter;
 use LogicException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -20,6 +21,7 @@ class ConvertSpecTestCommand extends Command
 {
     private const SUITES = [
         'crud-v2' => CrudV2SuiteConverter::class,
+        'transactions' => TransactionsSuiteConverter::class,
     ];
 
     protected function configure()
@@ -28,7 +30,7 @@ class ConvertSpecTestCommand extends Command
 
         $this
             ->addArgument('suite', InputArgument::REQUIRED, 'Test suite to convert')
-            ->addArgument('mask', InputArgument::OPTIONAL, 'Optional file mask for tests', '**.yml')
+            ->addArgument('mask', InputArgument::OPTIONAL, 'Optional file mask for tests')
         ;
     }
 
@@ -42,7 +44,7 @@ class ConvertSpecTestCommand extends Command
 
         $converter = self::SUITES[$suite];
 
-        (new SpecTestToUnifiedConverter($converter))->convert();
+        (new SpecTestToUnifiedConverter($converter))->convert($input->getArgument('mask'));
 
         return Command::SUCCESS;
     }
