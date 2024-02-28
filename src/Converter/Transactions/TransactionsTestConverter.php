@@ -7,7 +7,6 @@ use App\Converter\Operation\LegacyOperationConverter;
 use App\Converter\TestItemConverterInterface;
 use App\Converter\Tests\ExpectationsConverter;
 use App\Converter\Tests\OutcomeConverter;
-use App\Converter\YamlAnchorAwareConverter;
 use Symfony\Component\Yaml\Reference\Reference;
 use function App\array_filter_null;
 use function array_unshift;
@@ -44,7 +43,7 @@ final class TransactionsTestConverter implements TestItemConverterInterface
             // failPoint handled above
             // clientOptions not supported, will cause errors to point out manual work
             'clientOptions' => $data->clientOptions ?? null,
-            // clientOptions not supported, will cause errors to point out manual work
+            // sessionOptions not supported, will cause errors to point out manual work
             'sessionOptions' => $data->sessionOptions ?? null,
             'operations' => $operations,
             'expectEvents' => $expectations,
