@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Converter\Crud\V2\CrudV2SuiteConverter;
 use App\Converter\SpecTestToUnifiedConverter;
 use App\Converter\TestSuiteConverterInterface;
+use App\Converter\RetryableWrites\RetryableWritesSuiteConverter;
 use App\Converter\Transactions\TransactionsSuiteConverter;
 use LogicException;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -21,6 +22,7 @@ class ConvertSpecTestCommand extends Command
 {
     private const SUITES = [
         'crud-v2' => CrudV2SuiteConverter::class,
+        'retryable-writes' => RetryableWritesSuiteConverter::class,
         'transactions' => TransactionsSuiteConverter::class,
     ];
 
