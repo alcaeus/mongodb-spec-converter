@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Converter\Crud\V1\CrudV1SuiteConverter;
 use App\Converter\Crud\V2\CrudV2SuiteConverter;
 use App\Converter\SpecTestToUnifiedConverter;
 use App\Converter\TestSuiteConverterInterface;
@@ -21,6 +22,7 @@ use function sprintf;
 class ConvertSpecTestCommand extends Command
 {
     private const SUITES = [
+        'crud-v1' => CrudV1SuiteConverter::class,
         'crud-v2' => CrudV2SuiteConverter::class,
         'retryable-writes' => RetryableWritesSuiteConverter::class,
         'transactions' => TransactionsSuiteConverter::class,
